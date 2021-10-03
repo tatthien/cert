@@ -18,3 +18,7 @@ $ cert --host=12bit.vn
 Issued by: GTS CA 1D4
 Expires: 2021-12-25 02:45:49 +0000 UTC (2 months from now
 ```
+
+## License
+
+MIT © Thien Nguyen
