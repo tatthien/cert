@@ -4,21 +4,34 @@ import (
 	"crypto/tls"
 	"crypto/x509/pkix"
 	"fmt"
+	"net"
 	"time"
 )
+
+var (
+	dialer = &net.Dialer{Timeout: 5 * time.Second}
+)
+
+type CertChecker struct {
+	Hostname string
+}
 
 type Cert struct {
 	Issuer  pkix.Name
 	Expires time.Time
 }
 
-// GetCertificate get the certificate information from the provided hostname.
-func GetCertificate(hostname string) (Cert, error) {
-	addr := fmt.Sprintf("%s:%d", hostname, 443)
+func New(hostname string) *CertChecker {
+	return &CertChecker{
+		Hostname: hostname,
+	}
+}
 
-	conn, err := tls.Dial("tcp", addr, &tls.Config{
-		InsecureSkipVerify: true,
-	})
+// GetCertificate get the certificate information from the provided hostname.
+func (ck *CertChecker) GetCertificate() (Cert, error) {
+	addr := fmt.Sprintf("%s:%d", ck.Hostname, 443)
+
+	conn, err := tls.DialWithDialer(dialer, "tcp", addr, nil)
 
 	if err != nil {
 		return Cert{}, err
@@ -26,9 +39,16 @@ func GetCertificate(hostname string) (Cert, error) {
 
 	defer conn.Close()
 
-	cert := conn.ConnectionState().PeerCertificates[0]
+	err = conn.VerifyHostname(ck.Hostname)
+
+	if err != nil {
+		return Cert{}, err
+	}
+
+	c := conn.ConnectionState().PeerCertificates[0]
+
 	return Cert{
-		Issuer:  cert.Issuer,
-		Expires: cert.NotAfter,
+		Issuer:  c.Issuer,
+		Expires: c.NotAfter,
 	}, nil
 }
