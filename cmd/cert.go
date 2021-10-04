@@ -30,13 +30,13 @@ func Execute() {
 		cert, err := ck.GetCertificate()
 
 		if err != nil {
-			fmt.Printf("🚨%s\n", err.Error())
+			fmt.Printf("%s\n", err.Error())
 		} else {
-			fmt.Println("✅This certificate is valid")
-			fmt.Printf("🏛️ Issued by: %s\n", cert.Issuer.CommonName)
-			fmt.Printf("  ├── Org: %s\n", cert.Issuer.Organization[0])
-			fmt.Printf("  └── Country: %s\n", cert.Issuer.Country[0])
-			fmt.Printf("🕐Expires: %v (%s)\n", cert.Expires.Format(time.RFC850), humanize.Time(cert.Expires))
+			fmt.Println("This certificate is valid")
+			fmt.Printf("Issued by: %s\n", cert.Issuer.CommonName)
+			fmt.Printf(" ├── Org: %s\n", cert.Issuer.Organization[0])
+			fmt.Printf(" └── Country: %s\n", cert.Issuer.Country[0])
+			fmt.Printf("Expires: %v (%s)\n", cert.Expires.Format(time.RFC850), humanize.Time(cert.Expires))
 			fmt.Println()
 		}
 	}
